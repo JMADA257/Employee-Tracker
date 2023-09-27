@@ -1,7 +1,4 @@
 const mysql = require("mysql2");
-const inquirer = requrie("inquirer")
-
-const PORT = process.env.PORT || 3001;
 
 const db = mysql.createConnection(
   {
@@ -12,3 +9,14 @@ const db = mysql.createConnection(
   },
   console.log("Connected to the employeetracker_db database.")
 );
+
+db.connect(function(err) {
+  if (err) throw err;
+  // db.query("SELECT * FROM roles", function (err, result, fields) {
+  //   if (err) throw err;
+
+  //   console.log(result);
+  // });
+});
+
+module.exports = db
