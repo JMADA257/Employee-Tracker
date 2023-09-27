@@ -9,13 +9,12 @@ const initQuestion = [
     name: "choice",
     message: "Please choose!",
     choices: [
-      "View all departments.",
-      "View all roles.",
+      "View all department.",
+      "View all role.",
       "View all employees.",
       "Add a department.",
       "Add a role.",
       "Add an employee.",
-      "Delete an employee.",
       "Update an employee role.",
       "Quit.",
     ],
@@ -26,11 +25,11 @@ async function init() {
   const { choice } = await inquirer.prompt(initQuestion);
   console.log(choice);
   switch (choice) {
-    case "View all departments.":
-      viewAllDepartments();
+    case "View all department.":
+      viewAlldepartment();
       break;
-    case "View all roles.":
-      viewAllRoles();
+    case "View all role.":
+      viewAllRole();
       break;
     case "View all employees.":
       viewAllEmployees();
@@ -44,9 +43,6 @@ async function init() {
     case "Add an employee.":
       addAEmployee();
       break;
-    case "Delete an employee.":
-      deleteAnEmployee();
-      break;
     case "Update an employee role.":
       updateEmployeeRole();
       break;
@@ -58,26 +54,30 @@ async function init() {
   return;
 }
 
-async function viewAllDepartments() {
-  const result = await query("SELECT * FROM departments"); //join to show depertments instead of id
+async function viewAlldepartment() {
+  const result = await query("SELECT * FROM department");
   console.table(result);
   init();
 }
 
-async function viewAllRoles() {
-  const result = await query("SELECT * FROM role"); //join to show depertments instead of id
+async function viewAllRole() {
+  const result = await query(
+    "SELECT role.id, title, department.name as department, salary FROM role JOIN department ON department.id = role.department_id"
+  ); //join to show depertments instead of id
   console.table(result);
   init();
 }
 
 async function viewAllEmployees() {
-  const result = await query("SELECT * FROM employee"); //join to show depertments instead of id
+  const result = await query(
+    "SELECT employee.id, first_name, last_name, title, name AS department, salary, manager_id FROM employee JOIN role ON role.id = employee.role_id JOIN department ON department.id = role.department_id ORDER BY employee.id"
+  );
   console.table(result);
   init();
 }
 
 async function addARole() {
-  const departments = await query("SELECT id AS value,name FROM departments");
+  const department = await query("SELECT id AS value,name FROM department");
   const questions = [
     {
       type: "input",
@@ -93,7 +93,7 @@ async function addARole() {
       type: "list",
       name: "department_id",
       message: "Please tell me your new department!",
-      choices: departments,
+      choices: department,
     },
   ];
   const { title, salary, department_id } = await inquirer.prompt(questions);
@@ -102,7 +102,7 @@ async function addARole() {
     "INSERT INTO role (title, salary, department_id) VALUES(?, ?, ?)",
     [title, salary, department_id]
   );
-  viewAllRoles();
+  viewAllRole();
 }
 
 async function addADepartment() {
@@ -115,14 +115,14 @@ async function addADepartment() {
   ];
   const { name } = await inquirer.prompt(questions);
 
-  await query("INSERT INTO departments (name) VALUES(?)", [name]);
-  viewAllDepartments();
+  await query("INSERT INTO department (name) VALUES(?)", [name]);
+  viewAlldepartment();
 }
 
 async function addAEmployee() {
-  const roles = await query("SELECT title AS name, id AS value FROM role");
+  const role = await query("SELECT title AS name, id AS value FROM role");
   const managers = await query(
-    "SELECT CONCAT(first_name, last_name) as name, id AS value FROM employee WHERE manager_id IS null"
+    `SELECT CONCAT(first_name, " ", last_name) as name, id AS value FROM employee WHERE manager_id IS null`
   );
 
   const questions = [
@@ -138,9 +138,9 @@ async function addAEmployee() {
     },
     {
       type: "list",
-      name: "roles_id",
+      name: "role_id",
       message: "Please tell me your new role!",
-      choices: roles,
+      choices: role,
     },
     {
       type: "list",
@@ -149,20 +149,43 @@ async function addAEmployee() {
       choices: managers,
     },
   ];
-  const { first_name, last_name, roles_id, manager_id } = await inquirer.prompt(
+  const { first_name, last_name, role_id, manager_id } = await inquirer.prompt(
     questions
   );
 
   await query(
-    "INSERT INTO employee (first_name, last_name, roles_id, manager_id) VALUES(?, ?, ?, ?)",
-    [first_name, last_name, roles_id, manager_id]
+    "INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES(?, ?, ?, ?)",
+    [first_name, last_name, role_id, manager_id]
   );
   viewAllEmployees();
 }
 
-async function updateEmployeeRole() {} //future
+async function updateEmployeeRole() {
+  const fullName = await query(
+    `SELECT CONCAT(first_name, " ", last_name) as name, id AS value FROM employee`
+  );
+  const allRole = await query(`SELECT id AS value, title AS name FROM role`);
 
-async function deleteAnEmployee() {} //Future
+  const questions = [
+    {
+      type: "list",
+      name: "name",
+      message: "Please choose the employee you'd like to update.",
+      choices: fullName,
+    },
+    {
+      type: "list",
+      name: "role_id",
+      message: "Please choose the role you would like to assign.",
+      choices: allRole,
+    },
+  ];
+
+  const { name, role_id } = await inquirer.prompt(questions);
+
+  await query("UPDATE employee SET role_id = ? WHERE id = ?", [role_id, name]);
+  viewAllEmployees();
+}
 
 const quit = () => {
   console.log("Goodbye!");
@@ -170,3 +193,5 @@ const quit = () => {
 };
 
 init();
+
+//show manager on view all employee screen
