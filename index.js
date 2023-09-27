@@ -116,6 +116,11 @@ async function addADepartment() {
 }
 
 async function addAEmployee() {
+  const roles = await query("SELECT title AS name, id AS value FROM role");
+  const managers = await query(
+    "SELECT CONCAT(first_name, last_name) as name, id AS value FROM employee WHERE manager_id = null"
+  );
+
   const questions = [
     {
       type: "Input",
@@ -127,19 +132,33 @@ async function addAEmployee() {
       name: "last_name",
       message: "Please tell me your new first name!",
     },
+    {
+      type: "list",
+      name: "role_id",
+      message: "Please tell me your new role!",
+      choices: roles,
+    },
+    {
+      type: "list",
+      name: "manager_id",
+      message: "Please tell me your new manager!",
+      choices: managers,
+    },
   ];
-  const { first_name, last_name } = await inquirer.prompt(questions);
+  const { first_name, last_name, role_id, manager_id } = await inquirer.prompt(
+    questions
+  );
 
-  await query("INSERT INTO employee (first_name, last_name) VALUES(?, ?)", [
-    first_name,
-    last_name,
-  ]);
+  await query(
+    "INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES(?, ?, ?, ?)",
+    [first_name, last_name, role_id, manager_id]
+  );
   viewAllEmployees();
 }
 
-async function quit() {
-  console.log("goodbye");
-  return;
-}
+const quit = () => {
+  console.log("Goodbye!");
+  process.exit();
+};
 
 init();
