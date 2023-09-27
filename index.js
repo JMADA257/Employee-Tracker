@@ -43,9 +43,12 @@ async function init() {
     case "add an employee":
       addAEmployee();
       break;
-    // case "update an employee role":
-    //   statements;
-    //   break;
+    case "Delete an employee.":
+      deleteAnEmployee();
+      break;
+    case "update an employee role":
+      updateEmployeeRole();
+      break;
     case "quit":
       quit();
       break;
@@ -118,7 +121,7 @@ async function addADepartment() {
 async function addAEmployee() {
   const roles = await query("SELECT title AS name, id AS value FROM role");
   const managers = await query(
-    "SELECT CONCAT(first_name, last_name) as name, id AS value FROM employee WHERE manager_id = null"
+    "SELECT CONCAT(first_name, last_name) as name, id AS value FROM employee WHERE manager_id IS null"
   );
 
   const questions = [
@@ -134,7 +137,7 @@ async function addAEmployee() {
     },
     {
       type: "list",
-      name: "role_id",
+      name: "roles_id",
       message: "Please tell me your new role!",
       choices: roles,
     },
@@ -145,16 +148,20 @@ async function addAEmployee() {
       choices: managers,
     },
   ];
-  const { first_name, last_name, role_id, manager_id } = await inquirer.prompt(
+  const { first_name, last_name, roles_id, manager_id } = await inquirer.prompt(
     questions
   );
 
   await query(
-    "INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES(?, ?, ?, ?)",
-    [first_name, last_name, role_id, manager_id]
+    "INSERT INTO employee (first_name, last_name, roles_id, manager_id) VALUES(?, ?, ?, ?)",
+    [first_name, last_name, roles_id, manager_id]
   );
   viewAllEmployees();
 }
+
+async function updateEmployeeRole() {} //future
+
+async function deleteAnEmployee() {} //Future
 
 const quit = () => {
   console.log("Goodbye!");

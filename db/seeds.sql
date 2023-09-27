@@ -15,12 +15,13 @@ VALUES ("Lead engineer", 140000, 1),
        
 
 INSERT INTO employee (first_name, last_name, roles_id, manager_id)
-VALUES ("Jordan", "Adams", 4, null),
-		("Jake", "Zook", 2, 1),
-       ("Maisie", "Ciullo", 1, 1),
-       ("Lillian", "E", 3, 1),
-       ("Pete", "Richards", 4, 1),
-       ("Jason", "Borne", 1, 5),
-       ("Steven", "Rodriguez", 2, 6);
+VALUES 
+        ("Jordan", "Adams", 4, null),
+        ("Jake", "Zook", 2, 1),
+        ("Maisie", "Ciullo", 1, 1),
+        ("Lillian", "E", 3, null),
+        ("Pete", "Richards", 4, null),
+        ("Jason", "Borne", 1, 3),
+        ("Steven", "Rodriguez", 2, 6);
 
 
