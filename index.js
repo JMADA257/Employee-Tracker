@@ -25,31 +25,31 @@ async function init() {
   const { choice } = await inquirer.prompt(initQuestion);
   console.log(choice);
   switch (choice) {
-    case "view all departments":
+    case "View all departments.":
       viewAllDepartments();
       break;
-    case "view all roles":
+    case "View all roles.":
       viewAllRoles();
       break;
-    case "view all employees":
+    case "View all employees.":
       viewAllEmployees();
       break;
-    case "add a department":
+    case "Add a department.":
       addADepartment();
       break;
-    case "add a role":
+    case "Add a role.":
       addARole();
       break;
-    case "add an employee":
+    case "Add an employee.":
       addAEmployee();
       break;
     case "Delete an employee.":
       deleteAnEmployee();
       break;
-    case "update an employee role":
+    case "Update an employee role.":
       updateEmployeeRole();
       break;
-    case "quit":
+    case "Quit.":
       quit();
       break;
     default:
