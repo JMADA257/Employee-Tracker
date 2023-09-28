@@ -124,17 +124,20 @@ async function addAEmployee() {
   const managers = await query(
     `SELECT CONCAT(first_name, " ", last_name) as name, id AS value FROM employee WHERE manager_id IS null`
   );
-
+  managers.push({
+    name: "No Manager",
+    value: null,
+  });
   const questions = [
     {
       type: "Input",
       name: "first_name",
-      message: "Please tell me your new first name!",
+      message: "Please tell me the first name!",
     },
     {
       type: "Input",
       name: "last_name",
-      message: "Please tell me your new first name!",
+      message: "Please tell me the last name!",
     },
     {
       type: "list",
@@ -193,5 +196,3 @@ const quit = () => {
 };
 
 init();
-
-//show manager on view all employee screen
